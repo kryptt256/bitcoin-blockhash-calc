@@ -1,5 +1,3 @@
-use std::io::Cursor;
-use byteorder::{BigEndian, ReadBytesExt, LittleEndian, WriteBytesExt};
 
 pub struct BlockHeader {
     pub version: u32,
