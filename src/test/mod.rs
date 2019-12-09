@@ -12,7 +12,12 @@ fn test_calc_hash_block_490624() {
         bits: 402713392,
         nonce: 3060038614
     };
-    assert_eq!("000000000000000000d4c8b9d5388e42bf084e29546357c63cba8324ed4ec8bf", "");
+    let block_bytes = block_hash_util::get_block_bytes(block_header);
+    let digest = block_hash_util::get_sha256_blockhash(block_bytes);
+    let block_hash = digest.as_ref();
+    let mut bitcoin_block_hash = Vec::from(block_hash);
+    bitcoin_block_hash.reverse();
+    assert_eq!("dbfaba4d71021c1b651474dfe386214f5de4c123191926671e6096aa23f22298", hex::encode(bitcoin_block_hash));
 }
 
 #[test]
@@ -27,7 +32,7 @@ fn test_get_block_bytes() {
         bits: 402713392,
         nonce: 3060038614
     };
-    assert_eq!(block_hash_util::get_block_bytes(block_header), vec![0, 0, 0, 0, 236, 250, 239, 115, 4, 252, 16, 90, 48, 235, 0, 24, 214, 123, 100, 182]);
+    assert_eq!(block_hash_util::get_block_bytes(block_header), vec![0, 0, 0, 32, 87, 52, 238, 123, 88, 219, 229, 236, 116, 248, 208, 20, 178, 219, 192, 155, 87, 143, 29, 160, 242, 57, 66, 0, 0, 0, 0, 0, 0, 0, 0, 0, 134, 162, 177, 175, 169, 149, 185, 93, 193, 76, 61, 185, 102, 7, 55, 67, 197, 49, 177, 239, 56, 183, 182, 201, 114, 239, 221, 171, 236, 250, 239, 115, 4, 252, 16, 90, 48, 235, 0, 24, 214, 123, 100, 182]);
 }
 
 #[test]
@@ -46,5 +51,5 @@ fn get_sha256_blockhash() {
     let block_bytes = block_hash_util::get_block_bytes(block_header);
     let digest = block_hash_util::get_sha256_blockhash(block_bytes);
     let block_hash = digest.as_ref();
-    assert_eq!(hex::encode(block_hash), "342ce0611c8e31ad53b12a5d164df7aa6d4c861862c0578aaef7eb13607b3929");
+    assert_eq!(hex::encode(block_hash), "9822f223aa96601e6726191923c1e45d4f2186e3df7414651b1c02714dbafadb");
 }

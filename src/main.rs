@@ -17,7 +17,10 @@ fn main() {
     };
 
     let block_bytes = block_hash_util::get_block_bytes(block_header);
-    println!("{:?}", block_bytes);
     let digest = block_hash_util::get_sha256_blockhash(block_bytes);
     let block_hash = digest.as_ref();
+    println!("{:?}", hex::encode(block_hash));
+    let mut bhash = Vec::from(block_hash);
+    bhash.reverse();
+    println!("{:?}", hex::encode(bhash));
 }
