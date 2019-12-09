@@ -1,6 +1,6 @@
-extern crate hmac_sha256;
+extern crate ring;
 
-use hmac_sha256::Hash;
+use ring::digest::{Context, Digest, SHA256};
 use std::io::Cursor;
 use byteorder::{BigEndian, ReadBytesExt, LittleEndian, WriteBytesExt};
 
@@ -27,3 +27,16 @@ fn get_vec_as_u32(bytes: Vec<u8>) -> u32 {
     reader.read_u32::<BigEndian>().unwrap()
 }
 
+pub fn get_sha256_blockhash(bytes: Vec<u8>) -> Digest {
+    let byte_slice = bytes.as_slice();
+    let hash1 = get_digest_hash_ref(byte_slice);
+    let hash2 = get_digest_hash_ref(hash1.as_ref());
+    hash2
+}
+
+fn get_digest_hash_ref(slice: &[u8]) -> Digest {
+    let mut context = Context::new(&SHA256);
+    context.update(slice);
+    let hash = context.finish();
+    hash
+}
