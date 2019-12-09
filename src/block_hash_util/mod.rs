@@ -1,3 +1,8 @@
+extern crate hmac_sha256;
+
+use hmac_sha256::Hash;
+use std::io::Cursor;
+use byteorder::{BigEndian, ReadBytesExt, LittleEndian, WriteBytesExt};
 
 pub struct BlockHeader {
     pub version: u32,
@@ -8,21 +13,17 @@ pub struct BlockHeader {
     pub nonce: u32
 }
 
-use std::io::Cursor;
-use byteorder::{BigEndian, ReadBytesExt, LittleEndian, WriteBytesExt};
-
 pub fn get_block_bytes(block_header: BlockHeader) -> Vec<u8> {
-    let mut rprev_block = Cursor::new(block_header.hash_prev_block);
-    let mut rmerkle_root = Cursor::new(block_header.hash_merkle_root);
-    let prev_block = rprev_block.read_u32::<BigEndian>().unwrap();
-    let merkle_root = rmerkle_root.read_u32::<BigEndian>().unwrap();
-
+    let header_hash = vec![get_vec_as_u32(block_header.hash_prev_block), get_vec_as_u32(block_header.hash_merkle_root),
+                            block_header.time, block_header.bits, block_header.nonce]; 
+    
     let mut wtr: Vec<u8> = vec![];
-    wtr.write_u32::<LittleEndian>(block_header.version).unwrap();
-    wtr.write_u32::<LittleEndian>(prev_block).unwrap();
-    wtr.write_u32::<LittleEndian>(merkle_root).unwrap();
-    wtr.write_u32::<LittleEndian>(block_header.time).unwrap();
-    wtr.write_u32::<LittleEndian>(block_header.bits).unwrap();
-    wtr.write_u32::<LittleEndian>(block_header.nonce).unwrap();
+    header_hash.iter().for_each(|number| wtr.write_u32::<LittleEndian>(*number).unwrap());
     wtr
 }
+
+fn get_vec_as_u32(bytes: Vec<u8>) -> u32 {
+    let mut reader = Cursor::new(bytes);
+    reader.read_u32::<BigEndian>().unwrap()
+}
+
