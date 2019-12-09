@@ -1,2 +1,2 @@
 # bitcoin-blockhash-calc
-Compute a bitcoin block hash
+Rust efficient implementation of the computation of a block hash given the block header struct.
