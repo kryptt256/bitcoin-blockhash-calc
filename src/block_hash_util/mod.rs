@@ -16,18 +16,12 @@ pub fn get_block_bytes(block_header: BlockHeader) -> Vec<u8> {
     prev_block.reverse();
     let mut merkle_root = block_header.hash_merkle_root;
     merkle_root.reverse();
-
-    let header_last = vec![block_header.time, block_header.bits, block_header.nonce]; 
-    concat_block_header(block_header.version, &mut prev_block, &mut merkle_root, header_last)
+    concat_block_header(block_header.version, prev_block, merkle_root, block_header.time, block_header.bits, block_header.nonce)
 }
 
-fn concat_block_header(version: u32, prev_block: &mut Vec<u8>, merkle_root: &mut Vec<u8>, header_last: Vec<u32>) -> Vec<u8> {
-    let mut wtr: Vec<u8> = vec![];
-    wtr.extend_from_slice(&version.to_le_bytes());
-    wtr.extend_from_slice(&prev_block);
-    wtr.extend_from_slice(&merkle_root);
-    header_last.iter().for_each(|number| wtr.extend_from_slice(&(*number).to_le_bytes()));
-    wtr
+fn concat_block_header(version: u32, prev_block: Vec<u8>, merkle_root: Vec<u8>, time: u32, bits: u32, nonce: u32) -> Vec<u8> {
+    vec![(version.to_le_bytes()).to_vec(), prev_block, merkle_root, time.to_le_bytes().to_vec(), 
+    bits.to_le_bytes().to_vec(), nonce.to_le_bytes().to_vec()].iter().flatten().cloned().collect()
 }
 
 pub fn get_sha256_blockhash(bytes: Vec<u8>) -> Digest {
